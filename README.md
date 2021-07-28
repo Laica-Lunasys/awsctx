@@ -6,7 +6,9 @@ Add your `.bashrc` or `.zshrc` and follow "REPLACE ME" and "OPTIONAL"
 ```bash
 AWSCTX="$HOME/awsctx" # <-- REPLACE ME: path to awsctx
 sync-aws-profile() {
-    export AWS_PROFILE=$(cat $AWSCTX/aws_profile)
+    if [ -e "$AWSCTX/aws_profile" ]; then
+        export AWS_PROFILE=$(cat $AWSCTX/aws_profile)
+    fi
 }
 awsctx() {
     # ---
