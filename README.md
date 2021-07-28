@@ -16,9 +16,8 @@ awsctx() {
     # Uncomment me If you want to use CLI based 2FA
     # MFA_TOKEN=$(oathtool -b --totp $AWS_MFA_SECRET)
     # ---
-
     if [ "$MFA_TOKEN" != "" ]; then
-        bash $AWSCTX/awsctx.sh $@ $MFA_TOKEN
+        bash $AWSCTX/awsctx.sh $1 $MFA_TOKEN $([ "$#" -gt 1 ] && shift 1 && echo $@)
     else
         bash $AWSCTX/awsctx.sh $@
     fi
@@ -29,7 +28,7 @@ sync-aws-profile
 
 ## Usage
 ```bash
-awsctx <AWS_ACCOUNT> [MFA_TOKEN]
+awsctx <AWS_ACCOUNT/all> [MFA_TOKEN] [login|list-roles|console|...]
 # If you defined MFA_TOKEN: `awsctx myservice-production`
 # or else: `awsctx myservice-production 123456`
 ```
