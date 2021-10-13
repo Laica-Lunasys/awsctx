@@ -2,36 +2,65 @@ awsctx
 ===========================
 
 ## Setup
-Add your `.bashrc` or `.zshrc` and follow "REPLACE ME" and "OPTIONAL"
+Add your `.bashrc` or `.zshrc` and follow "OPTIONAL"
 ```bash
-AWSCTX="$HOME/awsctx" # <-- REPLACE ME: path to awsctx
 sync-aws-profile() {
     if [ -e "$AWSCTX/aws_profile" ]; then
         export AWS_PROFILE=$(cat $AWSCTX/aws_profile)
     fi
 }
-awsctx() {
-    # ---
-    # OPTIONAL: Insert MFA Secret
-    # Uncomment me If you want to use CLI based 2FA
-    # MFA_TOKEN=$(oathtool -b --totp $AWS_MFA_SECRET)
-    # ---
-    if [ "$MFA_TOKEN" != "" ]; then
-        bash $AWSCTX/awsctx.sh $1 $MFA_TOKEN $([ "$#" -gt 1 ] && shift 1 && echo $@)
-    else
-        bash $AWSCTX/awsctx.sh $@
-    fi
-    sync-aws-profile
-}
 sync-aws-profile
+
+# ---
+# Enable tab completion
+
+# zsh:
+eval "$(awsctx completion zsh)"
+
+# bash:
+eval "$(awsctx completion bash)"
+# ---
+
+# ---
+# OPTIONAL: Insert MFA Secret
+# Uncomment me If you want to use CLI based 2FA
+# MFA_TOKEN=$(oathtool -b --totp $AWS_MFA_SECRET)
+# alias awsctx='awsctx --mfa=$(oathtool -b --totp $MFA_TOKEN)'
+# ---
 ```
 
 ## Usage
 ```bash
-awsctx <AWS_ACCOUNT/all> [MFA_TOKEN] [login|list-roles|console|...]
-# If you defined MFA_TOKEN: `awsctx myservice-production`
-# or else: `awsctx myservice-production 123456`
+awsctx [completion|help|list|login|show] ...
+
+# List available accounts
+awsctx list
+
+# Show current AWS account
+awsctx show
+
+# Login
+awsctx login myservice-production
+
+# Login with MFA
+awsctx login --mfa=123456 myservice-production
+
+# Login and open AWS Management Console (-c, --console)
+awsctx login -c myservice-production
+
+# Login and get login URL (-l, --link)
+awsctx login -l myservice-production
+
+# Login and open AWS Management Console (with Firefox Multi-Account Containers) (-F, --firefox)
+awsctx login -cF myservice-production
 ```
+## Extra: Setup Firefox (Multi-Account Containers)
+### Install addons:
+Multi-Account Containers:
+https://addons.mozilla.org/ja/firefox/addon/multi-account-containers/
+
+Open container tabs from URL (Protocol Handler):
+https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/
 
 ## Extra: Setup oathtool (MFA_TOKEN)
 
