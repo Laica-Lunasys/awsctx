@@ -66,11 +66,11 @@ func (pr *Provider) Login(profile string, opts *LoginOption, mfa *MFA) error {
 			if err := exec.Command(f, "--help").Run(); err == nil {
 				fxBin = f
 			}
-		} else if err := exec.Command("firefox", "--help").Run(); err == nil {
+		} else if err := pr.execute("firefox", "--help").Run(); err == nil {
 			fxBin = "firefox"
-		} else if err := exec.Command("firefox.exe", "--help").Run(); err == nil {
+		} else if err := pr.execute("firefox.exe", "--help").Run(); err == nil {
 			fxBin = "firefox.exe"
-		} else if err := exec.Command("/Applications/Firefox.app/Contents/MacOS/firefox", "--help").Run(); err == nil {
+		} else if err := pr.execute("/Applications/Firefox.app/Contents/MacOS/firefox", "--help").Run(); err == nil {
 			fxBin = "/Applications/Firefox.app/Contents/MacOS/firefox"
 		}
 
@@ -163,6 +163,7 @@ func (pr *Provider) GetProfiles() ([]string, error) {
 
 func (pr *Provider) execute(command string, args ...string) *exec.Cmd {
 	cmd := exec.Command(command, args...)
+	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd
