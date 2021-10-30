@@ -66,11 +66,11 @@ func (pr *Provider) Login(profile string, opts *LoginOption, mfa *MFA) error {
 			if err := exec.Command(f, "--help").Run(); err == nil {
 				fxBin = f
 			}
-		} else if err := pr.execute("firefox", "--help").Run(); err == nil {
+		} else if err := exec.Command("firefox", "--help").Run(); err == nil {
 			fxBin = "firefox"
-		} else if err := pr.execute("firefox.exe", "--help").Run(); err == nil {
+		} else if err := exec.Command("firefox.exe", "--help").Run(); err == nil {
 			fxBin = "firefox.exe"
-		} else if err := pr.execute("/Applications/Firefox.app/Contents/MacOS/firefox", "--help").Run(); err == nil {
+		} else if err := exec.Command("/Applications/Firefox.app/Contents/MacOS/firefox", "--help").Run(); err == nil {
 			fxBin = "/Applications/Firefox.app/Contents/MacOS/firefox"
 		}
 
@@ -82,8 +82,8 @@ func (pr *Provider) Login(profile string, opts *LoginOption, mfa *MFA) error {
 
 	// Call saml2aws
 	cmd := exec.Command("saml2aws", baseCommand...)
-	res, err := cmd.CombinedOutput()
-	if !opts.Firefox || (opts.Firefox && err != nil) {
+	res, err := cmd.Output()
+	if opts.LinkOnly {
 		fmt.Println(string(res))
 	}
 	if err != nil {
