@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// loginCmd represents the login command
-var loginCmd = &cobra.Command{
-	Use:   "login",
-	Short: "Logging into AWS Account",
-	Long:  `Logging into AWS Account`,
+// openCmd represents the login command
+var openCmd = &cobra.Command{
+	Use:   "open",
+	Short: "Open browser",
+	Long:  `Open browser`,
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		p, err := service.GetSAML2AWS()
 		if err != nil {
@@ -34,18 +34,6 @@ var loginCmd = &cobra.Command{
 			panic(err)
 		}
 
-		// Console
-		console, err := cmd.Flags().GetBool("console")
-		if err != nil {
-			panic(err)
-		}
-
-		// Link
-		link, err := cmd.Flags().GetBool("link")
-		if err != nil {
-			panic(err)
-		}
-
 		// Firefox
 		firefox, err := cmd.Flags().GetBool("firefox")
 		if err != nil {
@@ -58,18 +46,12 @@ var loginCmd = &cobra.Command{
 			panic(err)
 		}
 
-		// Update Profile
-		updateProfile := true
-		if os.Getenv("NO_AWS_PROFILE") != "" {
-			updateProfile = false
-		}
-
 		if err := p.Login(args[0],
 			&service.LoginOption{
-				Console:       console,
-				LinkOnly:      link,
+				Console:       true,
+				LinkOnly:      false,
 				Firefox:       firefox,
-				UpdateProfile: updateProfile,
+				UpdateProfile: false,
 			},
 			func() *service.MFA {
 				if token != "" {
@@ -84,8 +66,6 @@ var loginCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(loginCmd)
-	loginCmd.Flags().BoolP("console", "c", false, "Open AWS Management Console (browser)")
-	loginCmd.Flags().BoolP("firefox", "F", false, "Open as Firefox")
-	loginCmd.Flags().BoolP("link", "l", false, "Present link to AWS console instead of opening browser")
+	rootCmd.AddCommand(openCmd)
+	openCmd.Flags().BoolP("firefox", "F", false, "Open as Firefox")
 }

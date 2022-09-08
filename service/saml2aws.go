@@ -19,9 +19,10 @@ type MFA struct {
 }
 
 type LoginOption struct {
-	Console  bool
-	LinkOnly bool
-	Firefox  bool
+	Console       bool
+	LinkOnly      bool
+	Firefox       bool
+	UpdateProfile bool
 }
 
 func GetSAML2AWS() (*Provider, error) {
@@ -93,8 +94,10 @@ func (pr *Provider) Login(profile string, opts *LoginOption, mfa *MFA) error {
 	// Open firefox
 	if opts.Firefox {
 		color := "turquoise"
-		if strings.Contains(profile, "staging") || strings.Contains(profile, "stg") {
-			color = "purple"
+		if strings.Contains(profile, "develop") || strings.Contains(profile, "dev") {
+			color = "green"
+		} else if strings.Contains(profile, "staging") || strings.Contains(profile, "stg") {
+			color = "yellow"
 		} else if strings.Contains(profile, "production") || strings.Contains(profile, "prod") {
 			color = "pink"
 		}
@@ -111,18 +114,20 @@ func (pr *Provider) Login(profile string, opts *LoginOption, mfa *MFA) error {
 	}
 
 	// Update current profile
-	f, err := os.Create(pr.profilePath)
-	defer f.Close()
-	if err != nil {
-		return err
-	}
-	_, err = f.Write([]byte(profile))
-	if err != nil {
-		return err
-	}
+	if opts.UpdateProfile {
+		f, err := os.Create(pr.profilePath)
+		defer f.Close()
+		if err != nil {
+			return err
+		}
+		_, err = f.Write([]byte(profile))
+		if err != nil {
+			return err
+		}
 
-	// Update env
-	os.Setenv("AWS_PROFILE", profile)
+		// Update env
+		os.Setenv("AWS_PROFILE", profile)
+	}
 	return nil
 }
 
